@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}View Member{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="col-md-9 col-md-offset-1">
+                <div class="col-md-4 col-md-offset-8">
+                    <form role="form" method="post" name="search_form">
+                        {% csrf_token %}
+                        <input type="search" class="form-control" name="keywords" placeholder="Enter keywords to search" id="id_search_input" onkeyup="whenkeyup()" autofocus="True">
+                            </form>
+                </div>
+                <script type="text/javascript">
+                    function whenkeyup () {
+                        var oldvalue = document.getElementById('id_search_input').value
+                        setTimeout(function(){
+                                   var newvalue = document.getElementById('id_search_input').value
+                                   if (oldvalue == newvalue) {
+                                   document.search_form.submit();
+                                   };
+                                   },1500);
+                    }
+                </script>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in member_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="/myaccount?user={{member.user.username}}/">{{ member.user.username }}</a></td>
+                            <td>{{ member.user.email }}</td>
+                            {% if member.permission == 1 %}
+                            <td>Member</td>
+                            {% endif %}
+                            {% if member.permission == 2 %}
+                            <td>Librarian</td>
+                            {% endif %}
+                            {% if member.permission == 0 %}
+                            <td>Limited</td>
+                            {% endif %}
+                            <td></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>Not found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

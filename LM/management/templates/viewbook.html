@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}View Book{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+			<div class="col-md-2">
+				<div class="list-group">
+					<a href="/viewbook/" class="list-group-item" id="id_typ_all">
+						All Books
+					</a>
+					{% for typ in type_list %}
+					<a href="/viewbook?typ={{typ}}" class="list-group-item" id="id_typ_{{typ}}">
+						{{ typ }}
+					</a>
+					{% endfor %}
+				</div>
+				<script type="text/javascript">
+				    var act_typ = document.getElementById("id_typ_{{book_type}}");
+				    var new_class = act_typ.getAttribute("class") + " active"
+				    act_typ.setAttribute("class",new_class);
+				</script>
+			</div>
+			<div class="col-md-9 col-md-offset-1">
+				<div class="col-md-4 col-md-offset-8">
+					<form role="form" method="post" name="search_form">
+						{% csrf_token %}
+						<input type="search" class="form-control" name="keywords" placeholder="Enter keywords to search" id="id_search_input" onkeyup="whenkeyup()" autofocus="True">
+					</form>
+				</div>
+				<script type="text/javascript">
+					function whenkeyup () {
+						var oldvalue = document.getElementById('id_search_input').value
+						setTimeout(function(){
+							var newvalue = document.getElementById('id_search_input').value
+							if (oldvalue == newvalue) {
+								document.search_form.submit();
+							};
+						},1500);
+					}
+				</script>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Title</th>
+							<th>Author</th>
+							<th>Published Date</th>
+							<th>Price</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for book in book_list %}
+						<tr>
+							<td>{{ forloop.counter }}</td>
+							<td><a href="/viewbook/detail/?id={{book.id}}">{{ book.name }}</a></td>
+							<td>{{ book.author }}</td>
+							<td>{{ book.pubDate|date:"Y-m-d" }}</td>
+							<td>{{ book.price|floatformat:2 }}</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td>Not found</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<nav>
+					<ul class="pager">
+						{% if book_list.has_previous %}
+							<li class="previous"><a href="?typ={{book_type}}&page={{ book_list.previous_page_number }}">previous</a></li>
+						{% else %}
+							<li class="previous disabled"><a href="#">previous</a></li>
+						{% endif %}
+						Page {{ book_list.number }} / {{ book_list.paginator.num_pages }}
+						{% if book_list.has_next %}
+							<li class="next"><a href="?typ={{book_type}}&page={{ book_list.next_page_number }}">Next</a></li>
+						{% else %}
+							<li class="next disabled"><a href="#">Next</a></li>
+						{% endif %}
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}
